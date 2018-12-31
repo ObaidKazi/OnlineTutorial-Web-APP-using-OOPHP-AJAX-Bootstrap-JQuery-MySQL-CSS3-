@@ -1,0 +1,342 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema OnlineTutorial
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema OnlineTutorial
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `OnlineTutorial` DEFAULT CHARACTER SET utf8 ;
+USE `OnlineTutorial` ;
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Users`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Users` (
+  `Username` VARCHAR(30) NOT NULL,
+  `Password` TEXT NOT NULL,
+  `Fname` CHAR(20) NOT NULL,
+  `Mname` CHAR(20) NOT NULL,
+  `Lname` CHAR(20) NOT NULL,
+  `EmailID` VARCHAR(60) NOT NULL,
+  `ContactNo` VARCHAR(20) NOT NULL,
+  `Address` MEDIUMTEXT NOT NULL,
+  `DOB` DATE NOT NULL,
+  `Age` INT NOT NULL,
+  `Image` MEDIUMTEXT NULL,
+  `Quest` VARCHAR(100) NOT NULL,
+  `Ans` VARCHAR(100) NOT NULL,
+  `CreationTime` TIMESTAMP(2) NOT NULL,
+  `LastModified` TIMESTAMP(2) NULL,
+  PRIMARY KEY (`Username`),
+  UNIQUE INDEX `Email_ID_UNIQUE` (`EmailID` ASC) ,
+  UNIQUE INDEX `Contact_no_UNIQUE` (`ContactNo` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Faculty`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Faculty` (
+  `FID` INT NOT NULL AUTO_INCREMENT,
+  `Designation` VARCHAR(25) NOT NULL,
+  `Qualification` VARCHAR(100) NOT NULL,
+  `Specialization` VARCHAR(255) NOT NULL,
+  `Experience` VARCHAR(10) NOT NULL,
+  `DOJ` DATE NOT NULL,
+  `dept_id` INT NULL,
+  `LastModified` TIMESTAMP(2) NULL,
+  `Username` VARCHAR(30) NULL,
+  PRIMARY KEY (`FID`),
+  INDEX `Facult_Users_FK_idx` (`Username` ASC) ,
+  INDEX `fk_Faculty_Department_idx` (`dept_id` ASC) ,
+  CONSTRAINT `fk_Faculty_Users`
+    FOREIGN KEY (`Username`)
+    REFERENCES `OnlineTutorial`.`Users` (`Username`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Faculty_Department`
+    FOREIGN KEY (`dept_id`)
+    REFERENCES `OnlineTutorial`.`Department` (`dept_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Department`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Department` (
+  `dept_id` INT NOT NULL AUTO_INCREMENT,
+  `dept_name` VARCHAR(30) NOT NULL,
+  `hod` INT NULL,
+  PRIMARY KEY (`dept_id`),
+  INDEX `fk_Department_Faculty_idx` (`hod` ASC) ,
+  UNIQUE INDEX `dept_name_UNIQUE` (`dept_name` ASC) ,
+  CONSTRAINT `fk_Department_Faculty`
+    FOREIGN KEY (`hod`)
+    REFERENCES `OnlineTutorial`.`Faculty` (`FID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Student`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Student` (
+  `RNO` INT NOT NULL AUTO_INCREMENT,
+  `Year` VARCHAR(20) NOT NULL,
+  `Class` VARCHAR(2) NOT NULL,
+  `DOA` DATE NULL,
+  `dept_id` INT NULL,
+  `Username` VARCHAR(30) NULL,
+  `Last_Modified` TIMESTAMP NULL,
+  PRIMARY KEY (`RNO`),
+  INDEX `fk_Student_Users1_idx` (`Username` ASC) ,
+  INDEX `fk_Student_Department_idx` (`dept_id` ASC) ,
+  CONSTRAINT `fk_Student_Users1`
+    FOREIGN KEY (`Username`)
+    REFERENCES `OnlineTutorial`.`Users` (`Username`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Student_Department`
+    FOREIGN KEY (`dept_id`)
+    REFERENCES `OnlineTutorial`.`Department` (`dept_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Course`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Course` (
+  `CID` INT NOT NULL AUTO_INCREMENT,
+  `CName` VARCHAR(100) NOT NULL,
+  `COutcome` LONGTEXT NOT NULL,
+  `CDuration` VARCHAR(30) NOT NULL,
+  `CPreq` VARCHAR(100) NULL,
+  `Last_Modified` TIMESTAMP(2) NULL,
+  PRIMARY KEY (`CID`),
+  UNIQUE INDEX `CPreq_UNIQUE` (`CPreq` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Groups`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Groups` (
+  `GroupName` VARCHAR(30) NOT NULL,
+  `CreationTime` TIMESTAMP(2) NOT NULL,
+  PRIMARY KEY (`GroupName`),
+  UNIQUE INDEX `GroupName_UNIQUE` (`GroupName` ASC) )
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Belongs`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Belongs` (
+  `GroupName` VARCHAR(30) NOT NULL,
+  `Username` VARCHAR(30) NOT NULL,
+  PRIMARY KEY (`GroupName`, `Username`),
+  INDEX `fk_Groups_has_Users_Users1_idx` (`Username` ASC) ,
+  INDEX `fk_Groups_has_Users_Groups_idx` (`GroupName` ASC) ,
+  CONSTRAINT `fk_Groups_has_Users_Groups`
+    FOREIGN KEY (`GroupName`)
+    REFERENCES `OnlineTutorial`.`Groups` (`GroupName`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Groups_has_Users_Users1`
+    FOREIGN KEY (`Username`)
+    REFERENCES `OnlineTutorial`.`Users` (`Username`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Takes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Takes` (
+  `RNO` INT NOT NULL,
+  `CID` INT NOT NULL,
+  `Year` VARCHAR(20) NOT NULL,
+  `Percentage` DECIMAL(5,2) NULL,
+  `Grade` VARCHAR(2) NULL,
+  `EnrollTime` TIMESTAMP(2) NOT NULL,
+  `Progress` VARCHAR(5) NOT NULL,
+  PRIMARY KEY (`RNO`, `CID`, `Year`),
+  INDEX `fk_Student_has_Course_Course1_idx` (`CID` ASC) ,
+  INDEX `fk_Student_has_Course_Student1_idx` (`RNO` ASC) ,
+  CONSTRAINT `fk_Student_has_Course_Student1`
+    FOREIGN KEY (`RNO`)
+    REFERENCES `OnlineTutorial`.`Student` (`RNO`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Student_has_Course_Course1`
+    FOREIGN KEY (`CID`)
+    REFERENCES `OnlineTutorial`.`Course` (`CID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Teaches`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Teaches` (
+  `CID` INT NOT NULL,
+  `FID` INT NOT NULL,
+  `Year` VARCHAR(20) NOT NULL,
+  PRIMARY KEY (`CID`, `FID`, `Year`),
+  INDEX `fk_Course_has_Faculty_Faculty1_idx` (`FID` ASC) ,
+  INDEX `fk_Course_has_Faculty_Course1_idx` (`CID` ASC) ,
+  CONSTRAINT `fk_Course_has_Faculty_Course1`
+    FOREIGN KEY (`CID`)
+    REFERENCES `OnlineTutorial`.`Course` (`CID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Course_has_Faculty_Faculty1`
+    FOREIGN KEY (`FID`)
+    REFERENCES `OnlineTutorial`.`Faculty` (`FID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Message`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Message` (
+  `MessageID` BIGINT NOT NULL AUTO_INCREMENT,
+  `SenderID` VARCHAR(30) NULL,
+  `RecieverID` VARCHAR(30) NOT NULL,
+  `Message` MEDIUMTEXT NOT NULL,
+  `ParentMsgID` BIGINT NULL,
+  `sendAt` TIMESTAMP(2) NULL,
+  PRIMARY KEY (`MessageID`),
+  INDEX `fk_Message_Users_1_idx` (`SenderID` ASC) ,
+  INDEX `fk_Message_Users_2_idx` (`RecieverID` ASC) ,
+  CONSTRAINT `fk_Message_Users_1`
+    FOREIGN KEY (`SenderID`)
+    REFERENCES `OnlineTutorial`.`Users` (`Username`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Message_Users_2`
+    FOREIGN KEY (`RecieverID`)
+    REFERENCES `OnlineTutorial`.`Users` (`Username`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Tutorial`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Tutorial` (
+  `CID` INT NOT NULL,
+  `Year` VARCHAR(20) NOT NULL,
+  `Topic` VARCHAR(300) NOT NULL,
+  `content` LONGTEXT NOT NULL,
+  `Name` MEDIUMTEXT NOT NULL,
+  `Weightage` INT NOT NULL,
+  `Media` MEDIUMTEXT NULL,
+  PRIMARY KEY (`CID`, `Year`, `Topic`),
+  CONSTRAINT `fk_Tutorial_Course`
+    FOREIGN KEY (`CID`)
+    REFERENCES `OnlineTutorial`.`Course` (`CID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Assignments`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Assignments` (
+  `CID` INT NOT NULL,
+  `Year` VARCHAR(20) NOT NULL,
+  `Topic` VARCHAR(300) NOT NULL,
+  `AssignNo` VARCHAR(5) NOT NULL,
+  `Marks` INT NOT NULL,
+  `Question` TEXT NOT NULL,
+  `Answer` TEXT NOT NULL,
+  `Option1` TEXT NULL,
+  `Option2` TEXT NULL,
+  `Option3` TEXT NULL,
+  `Option4` TEXT NULL,
+  `Option5` TEXT NULL,
+  `QuesImg` VARCHAR(100) NULL,
+  `Option1Img` VARCHAR(100) NULL,
+  `Option2Img` VARCHAR(100) NULL,
+  `Option3Img` VARCHAR(100) NULL,
+  `Option4Img` VARCHAR(100) NULL,
+  `Option5Img` VARCHAR(100) NULL,
+  `Name` MEDIUMTEXT NULL,
+  PRIMARY KEY (`CID`, `Year`, `Topic`, `AssignNo`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`Response`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`Response` (
+  `CID` INT NOT NULL,
+  `Year` VARCHAR(20) NOT NULL,
+  `Topic` VARCHAR(300) NOT NULL,
+  `AssignNo` VARCHAR(5) NOT NULL,
+  `RNO` INT NOT NULL,
+  `Answer` TEXT NOT NULL,
+  `Marks` INT NULL,
+  `Attempt1` TIMESTAMP NULL,
+  `Attempt2` TIMESTAMP NULL,
+  `Attempt3` TIMESTAMP NULL,
+  PRIMARY KEY (`CID`, `Year`, `Topic`, `AssignNo`, `RNO`),
+  INDEX `fk_Response_Student_idx` (`RNO` ASC) ,
+  CONSTRAINT `fk_Respone_Assignment`
+    FOREIGN KEY (`CID` , `Year` , `Topic` , `AssignNo`)
+    REFERENCES `OnlineTutorial`.`Assignments` (`CID` , `Year` , `Topic` , `AssignNo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Response_Student`
+    FOREIGN KEY (`RNO`)
+    REFERENCES `OnlineTutorial`.`Student` (`RNO`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `OnlineTutorial`.`enquiry`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `OnlineTutorial`.`enquiry` (
+  `ID` INT NULL AUTO_INCREMENT,
+  `Name` CHAR(100) NOT NULL,
+  `Contact` VARCHAR(15) NOT NULL,
+  `Email` VARCHAR(60) NOT NULL,
+  `Subject` VARCHAR(50) NOT NULL,
+  `Mesg` LONGTEXT NOT NULL,
+  `Time` TIMESTAMP(2) NOT NULL,
+  `GroupName` VARCHAR(30) NOT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE INDEX `Contact_UNIQUE` (`Contact` ASC) ,
+  UNIQUE INDEX `Email_UNIQUE` (`Email` ASC) ,
+  INDEX `fk_enquiry_Belongs1_idx` (`GroupName` ASC) ,
+  CONSTRAINT `fk_enquiry_Belongs1`
+    FOREIGN KEY (`GroupName`)
+    REFERENCES `OnlineTutorial`.`Belongs` (`GroupName`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
