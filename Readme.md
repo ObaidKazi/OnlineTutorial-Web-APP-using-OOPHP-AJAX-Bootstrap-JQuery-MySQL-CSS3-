@@ -7,7 +7,7 @@ The database is available inside Data directory with file named onlinetutorialdb
 * Copy the OnlineTutorial directory into xampp->htdocs folder and paste it (XAMPP server is used for apache and mysql)
 * enable apache and mysql server from xampp
 * open any html 5 browser and navigate to localhost/OnlineTutorial to start using the web app
-* Data direcotry contains the database of this project .sql file
+* Data directory contains the database of this project .sql file
 
 
 ### Prerequisites
