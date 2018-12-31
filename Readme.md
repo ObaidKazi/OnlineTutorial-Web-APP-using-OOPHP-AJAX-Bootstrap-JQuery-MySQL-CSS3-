@@ -1,5 +1,5 @@
 # Project Title
-OnlineTutorial Web-APP Build using OOPHP,JQuery,AJAX,JQuery,Bootstrap,CSS3,MySQL,Apache
+OnlineTutorial Web-APP Build using OOPHP,JQuery,AJAX,Bootstrap,CSS3,MySQL,Apache
 
 ## Getting Started
 All the source code is available inside OnlineTutorial directory and OnlineTutorialSchema.mwb OnlineTutorialSchema.png file displays the database scheme built in workbench
